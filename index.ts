@@ -32,9 +32,10 @@ app.use("/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 
 // connect to mongodb
+const dbUrl=`${process.env.DB_URL || "mongodb://localhost:27017"}/authNotes`
 mongoose
-    .connect("mongodb://localhost:27017/authNotes")
-    .then(() => console.log("connected"))
+    .connect(dbUrl)
+    .then(() => console.log("connected to ",dbUrl))
     .catch((err) => console.error("couldn't connect to mongodb:", err));
 
 app.listen(PORT, () => {
