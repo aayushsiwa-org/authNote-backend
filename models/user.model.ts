@@ -28,11 +28,6 @@ const UserSchema = new Schema<IUser>({
     type: String,
     // Not required for OAuth users
   },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
   displayName: {
     type: String,
     trim: true

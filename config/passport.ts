@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import { saveUser } from "../controllers/auth.controller"; // Import saveUser function
-import { IUser } from "../models/user.model";
+import { User } from "../models/user.model";
 
 dotenv.config();
 
@@ -21,14 +21,17 @@ passport.use(
                     displayName: profile.displayName,
                     name: profile.displayName, // Use displayName as name initially
                     email: profile.emails?.[0]?.value,
-                    emails: profile.emails?.map((email) => ({ value: email.value })) || [],
+                    emails:
+                        profile.emails?.map((email) => ({
+                            value: email.value,
+                        })) || [],
                     provider: "google",
                     profilePicture: profile.photos?.[0]?.value,
                 };
 
                 // Call the saveUser function to save/retrieve the user from the database
                 const savedUser = await saveUser(userData);
-                
+
                 // Pass null as first arg (no error) and the user as second arg
                 return done(null, savedUser);
             } catch (error) {
@@ -55,6 +58,3 @@ passport.deserializeUser(async (id: string, done) => {
         done(error, null);
     }
 });
-
-// Import User model at the top of the file
-import { User } from "../models/user.model";

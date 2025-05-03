@@ -3,9 +3,12 @@ import passport from "passport";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { login, register } from "../controllers/auth.controller"; // ✅ Import controller functions
-import { User } from "../models/user.model";
-
 dotenv.config();
+const FE_URL =
+    process.env.MODE == "production"
+        ? process.env.FE_URL
+        : "http://locahost:5173";
+console.log("FE_URL", FE_URL);
 const router = Router();
 
 // Extend Express User type
@@ -37,7 +40,7 @@ router.get(
             const user = req.user;
             if (!user) {
                 res.status(401).json({ message: "Authentication failed" });
-                return next();
+                return res.redirect(`${FE_URL}?error=auth_failed`);
             }
 
             // Extract email from user object
@@ -55,12 +58,20 @@ router.get(
                     provider: user.provider,
                 },
                 process.env.JWT_SECRET!,
-                { expiresIn: "1h" }
+                { expiresIn: "7d" }
             );
-
             // Redirect to the frontend with the token
-            res.redirect(`http://localhost:5173?token=${token}`);
-            return next();
+            const redirectUrl = `${FE_URL}/auth/callback?token=${token}`;
+            res.redirect(redirectUrl);
+            // res.status(200).json({
+            //     token,
+            //     user: {
+            //         id: user._id,
+            //         email: user.email,
+            //         name: user.name,
+            //     },
+            // });
+            return;
         } catch (error) {
             next(error);
         }
